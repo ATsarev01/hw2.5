@@ -6,24 +6,29 @@ import com.github.atsarev01.collection.exeption.EmployeeStorageIsFullExeption;
 import com.github.atsarev01.collection.model.Employee;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmployeeService {
 
     private static final int SIZE = 3;
 
-    private final Collection<Employee> employees = new ArrayList<>();
+    private Map <String, Employee> employees;
+
+    public EmployeeService() {
+        this.employees = new HashMap<>();
+    }
 
     public Employee add(String firstName, String lastName) {
         if (employees.size() < SIZE) {
             Employee employee = new Employee(firstName, lastName);
-            if (employees.contains(employee)) {
+            if (employees.containsKey(employee.getFullName() )) {
                 throw new EmployeeAlreadyAddedExeption();
             }
-            employees.add(employee);
+            employees.put(employee.getFullName(), employee);
             return employee;
         }
         throw new EmployeeStorageIsFullExeption();
@@ -31,22 +36,22 @@ public class EmployeeService {
     }
     public Employee remove(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-        if (!employees.contains(employee)) {
+        if (!employees.containsKey(employee.getFullName())) {
             throw new EmployeeNotFoundExeption();
         }
-        employees.remove(employee);
+        employees.remove(employee.getFullName());
         return employee;
     }
     public Employee find(String firstName, String lastName) {
         Employee employee = new Employee(firstName, lastName);
-        if (!employees.contains(employee)) {
+        if (!employees.containsKey(employee.getFullName())) {
             throw new EmployeeNotFoundExeption();
         }
-        return employee;
+        return employees.get(employee.getFullName());
 
     }
 
     public Collection<Employee> employees() {
-        return Collections.unmodifiableCollection(employees);
+        return Collections.unmodifiableCollection(employees.values());
     }
 }
